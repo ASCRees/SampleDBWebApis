@@ -1,29 +1,14 @@
-# README #
+# README
 
-This README would normally document whatever steps are necessary to get your application up and running.
+SampleDBWebApis
 
-### What is this repository for? ###
+### What is this repository for?
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+- Contains some sample web apis written in MVC to read and write to a sample sql server database containg four tables that are based on the Northwind tables.
+- 0.1
+-
 
-### How do I get set up? ###
+### How do I get set up?
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+- After cloning run "Update-package -reinstall" in Package Manager console.
+- Build it and open in a browser. This will take you to the swagger page.
