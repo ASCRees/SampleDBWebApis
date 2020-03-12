@@ -180,6 +180,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Controllers\ProductsController.cs" />
+    <Compile Include="ModelBuilders\CustomerModelBuilders.cs" />
+    <Compile Include="ModelBuilders\ICustomerModelBuilders.cs" />
     <Compile Include="ModelBuilders\IProductModelBuilders.cs" />
     <Compile Include="ModelBuilders\ProductModelBuilders.cs" />
     <Compile Include="Models\CustomersViewModel.cs" />

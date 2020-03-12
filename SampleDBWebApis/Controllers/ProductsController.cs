@@ -84,18 +84,15 @@ namespace SampleDBWebApis.Controllers
             if (!ModelState.IsValid)
                 return ReturnResponse(new Object(), null, string.Empty, HttpStatusCode.BadRequest, "Not a valid model");
 
+            productModel = _productModelBuilder.BuildPutProductModel(productModel);
+
             if (productModel.ProductID > 0)
             {
-                productModel = _productModelBuilder.BuildPutProductModel(productModel);
-
-                if (productModel.ProductID > 0)
-                {
-                    return ReturnResponse(productModel, new JsonMediaTypeFormatter(), "application/json", HttpStatusCode.OK, string.Empty);
-                }
-                else
-                {
-                    return ReturnResponse(new Object(), null, string.Empty, HttpStatusCode.NotFound, "Unable to find the product");
-                }
+                return ReturnResponse(productModel, new JsonMediaTypeFormatter(), "application/json", HttpStatusCode.OK, string.Empty);
+            }
+            else
+            {
+                return ReturnResponse(new Object(), null, string.Empty, HttpStatusCode.NotFound, "Unable to find the product");
             }
 
             return PostProduct(productModel);
