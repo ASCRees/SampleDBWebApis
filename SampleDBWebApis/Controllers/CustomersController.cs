@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Web.Http;
 using AutoMapper;
+using SampleDBWebApis.ModelBuilders;
 using SampleDBWebApis.Models;
 using SampleDBWebApis.Service;
 using StructureMap;
@@ -15,11 +16,13 @@ namespace SampleDBWebApis.Controllers
     public class CustomersController : ApiController
     {
         private IBuildCustomersModelServices _buildModelsService;
+        private ICustomerModelBuilders _customerModelBuilder;
 
         [DefaultConstructor]
-        public CustomersController(IBuildCustomersModelServices buildModelsService)
+        public CustomersController(IBuildCustomersModelServices buildModelsService, ICustomerModelBuilders customerModelBuilder)
         {
             _buildModelsService = buildModelsService;
+            _customerModelBuilder = customerModelBuilder;
         }
 
         // GET /api/<controller>/5
@@ -31,12 +34,19 @@ namespace SampleDBWebApis.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("GetSingleCustomer/{id}")]
-        public CustomerViewModel GetSingleCustomer(string Id)
+        public HttpResponseMessage GetSingleCustomer(string Id)
         {
             var CustomerserviceModel = _buildModelsService.GetCustomer(Id);
             CustomerViewModel CustomerViewModel = Mapper.Map<CustomerViewModel>(CustomerserviceModel);
+            var returnHttStatusCode = HttpStatusCode.OK;
+            
+            if (CustomerViewModel == null)
+            {
+                returnHttStatusCode = HttpStatusCode.NotFound;
+            }
 
-            return CustomerViewModel;
+            return ReturnResponse(CustomerViewModel, new JsonMediaTypeFormatter(), "application/json", returnHttStatusCode, string.Empty);
+
         }
 
         /// <summary>
@@ -64,82 +74,74 @@ namespace SampleDBWebApis.Controllers
         // POST api/<controller>
         [HttpPost]
         [Route("PostCustomer")]
-        public HttpResponseMessage PostCustomer(CustomerViewModel CustomerModel)
+        public HttpResponseMessage PostCustomer(CustomerViewModel customerModel)
         {
+            try
+            {
+                var custContext = Mapper.Map<DataLayer.Customer>(customerModel);
+                custContext = _buildModelsService.CreateNewCustomer(custContext);
+                if (custContext == null)
+                {
+                    return ReturnResponse(customerModel, new JsonMediaTypeFormatter(), "application/json", HttpStatusCode.BadRequest, "Customer was not updated");
+                }
 
-            var prodContext = Mapper.Map<DataLayer.Customer>(CustomerModel);
-            prodContext = _buildModelsService.CreateNewCustomer(prodContext);
-            var returnCustomer = Mapper.Map<CustomerViewModel>(prodContext);
+                var returnCustomer = Mapper.Map<CustomerViewModel>(custContext);
+                return ReturnResponse(returnCustomer, new JsonMediaTypeFormatter(), "application/json", HttpStatusCode.Created, string.Empty);
 
-            return ReturnResponse(returnCustomer, new JsonMediaTypeFormatter(), "application/json", HttpStatusCode.Created, string.Empty);
+            }
+            catch(Exception ex)
+            {
+                return ReturnResponse(customerModel, new JsonMediaTypeFormatter(), "application/json", HttpStatusCode.BadRequest, ex.Message);
+            }
         }
-
 
         // PUT api/<controller>/5
         [HttpPut]
         [Route("PutCustomer")]
-        public HttpResponseMessage PutCustomer(CustomerViewModel CustomerModel)
+        public HttpResponseMessage PutCustomer(CustomerViewModel customerModel)
         {
-            if (!ModelState.IsValid)
-                return ReturnResponse(new Object(), null, string.Empty, HttpStatusCode.BadRequest, "Not a valid model" ); 
+            var updateCustomer = UpdateTheCustomer(ref customerModel);
 
-            var prodContext = new DataLayer.Customer();
-
-            if (!string.IsNullOrWhiteSpace(CustomerModel.CustomerID))
+            if (updateCustomer == null)
             {
-                prodContext = _buildModelsService.GetCustomer(CustomerModel.CustomerID);
-
-                if (prodContext != null)
-                {
-                    prodContext=Mapper.Map<DataLayer.Customer>(CustomerModel);
-                    _buildModelsService.UpdateCustomer();
-                    CustomerModel = Mapper.Map<CustomerViewModel>(prodContext);
-                    return ReturnResponse(CustomerModel, new JsonMediaTypeFormatter(), "application/json", HttpStatusCode.OK, string.Empty);
-                }
-                else
-                {
-                    return ReturnResponse(new Object(), null, string.Empty, HttpStatusCode.NotFound, "Unable to find the Customer");
-                }
+                return PostCustomer(customerModel);
             }
 
-            return PostCustomer(CustomerModel);
-
+            return updateCustomer;
         }
 
-        //[HttpPatch]
-        //[Route("PatchCustomer")]
-        //public HttpResponseMessage PatchCustomer(CustomerPatchViewModel CustomerModel)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return ReturnResponse(new Object(), null, string.Empty, HttpStatusCode.BadRequest, "Not a valid model");
+        private HttpResponseMessage UpdateTheCustomer(ref CustomerViewModel customerModel)
+        {
+            if (!ModelState.IsValid)
+                return ReturnResponse(new Object(), null, string.Empty, HttpStatusCode.BadRequest, "Not a valid model");
 
+            DataLayer.Customer custContext = _buildModelsService.GetCustomer(customerModel.CustomerID);
 
-        //    if (CustomerModel.CustomerID > 0)
-        //    {
-        //        var prodContext = _buildModelsService.GetCustomer(CustomerModel.CustomerID);
+            if (custContext != null)
+            {
+                //custContext = Mapper.Map<DataLayer.Customer>(customerModel);
+                //_buildModelsService.UpdateCustomer(custContext);
+                //customerModel = Mapper.Map<CustomerViewModel>(custContext);
+                customerModel = _customerModelBuilder.BuildPutCustomerModel(customerModel);
+                return ReturnResponse(customerModel, new JsonMediaTypeFormatter(), "application/json", HttpStatusCode.OK, string.Empty);
+            }
+            
+            return null;
+        }
 
-        //        if (prodContext != null)
-        //        {
+        [HttpPatch]
+        [Route("PatchCustomer")]
+        public HttpResponseMessage PatchCustomer(CustomerViewModel CustomerModel)
+        {
+            return PutCustomer(CustomerModel);
+        }
 
-        //            prodContext.CustomerName = CustomerModel.CustomerName;
-        //            prodContext.ReorderLevel = CustomerModel.ReorderLevel;
-        //            prodContext.UnitPrice = CustomerModel.UnitPrice;
-        //            prodContext.UnitsInStock = CustomerModel.UnitsInStock;
-        //            prodContext.UnitsOnOrder = CustomerModel.UnitsOnOrder;
-
-        //            _buildModelsService.UpdateCustomer();
-        //            CustomerModel = Mapper.Map<CustomerPatchViewModel>(prodContext);
-        //            return ReturnResponse(CustomerModel, new JsonMediaTypeFormatter(), "application/json", HttpStatusCode.OK, string.Empty);
-        //        }
-        //    }
-        //    return ReturnResponse(CustomerModel, new JsonMediaTypeFormatter(), "application/json", HttpStatusCode.NotFound, "Unable to find the Customer");
-        //}
         // DELETE api/<controller>/5
         public HttpResponseMessage DeleteCustomer(string Id)
         {
             var CustomerserviceModel = _buildModelsService.GetCustomer(Id);
 
-            if (CustomerserviceModel!=null)
+            if (CustomerserviceModel != null)
             {
                 _buildModelsService.DeleteCustomer(Id);
                 return ReturnResponse(CustomerserviceModel, new JsonMediaTypeFormatter(), "application/json", HttpStatusCode.NoContent, string.Empty);
