@@ -76,19 +76,41 @@ namespace SampleDBWebApis.Controllers
         [Route("PostCustomer")]
         public HttpResponseMessage PostCustomer(CustomerViewModel customerModel)
         {
+            try
+            {
+                var custContext = Mapper.Map<DataLayer.Customer>(customerModel);
+                custContext = _buildModelsService.CreateNewCustomer(custContext);
+                if (custContext == null)
+                {
+                    return ReturnResponse(customerModel, new JsonMediaTypeFormatter(), "application/json", HttpStatusCode.BadRequest, "Customer was not updated");
+                }
 
-            var custContext = Mapper.Map<DataLayer.Customer>(customerModel);
-            custContext = _buildModelsService.CreateNewCustomer(custContext);
-            var returnCustomer = Mapper.Map<CustomerViewModel>(custContext);
+                var returnCustomer = Mapper.Map<CustomerViewModel>(custContext);
+                return ReturnResponse(returnCustomer, new JsonMediaTypeFormatter(), "application/json", HttpStatusCode.Created, string.Empty);
 
-            return ReturnResponse(returnCustomer, new JsonMediaTypeFormatter(), "application/json", HttpStatusCode.Created, string.Empty);
+            }
+            catch(Exception ex)
+            {
+                return ReturnResponse(customerModel, new JsonMediaTypeFormatter(), "application/json", HttpStatusCode.BadRequest, ex.Message);
+            }
         }
-
 
         // PUT api/<controller>/5
         [HttpPut]
         [Route("PutCustomer")]
         public HttpResponseMessage PutCustomer(CustomerViewModel customerModel)
+        {
+            var updateCustomer = UpdateTheCustomer(ref customerModel);
+
+            if (updateCustomer == null)
+            {
+                return PostCustomer(customerModel);
+            }
+
+            return updateCustomer;
+        }
+
+        private HttpResponseMessage UpdateTheCustomer(ref CustomerViewModel customerModel)
         {
             if (!ModelState.IsValid)
                 return ReturnResponse(new Object(), null, string.Empty, HttpStatusCode.BadRequest, "Not a valid model");
@@ -103,13 +125,8 @@ namespace SampleDBWebApis.Controllers
                 customerModel = _customerModelBuilder.BuildPutCustomerModel(customerModel);
                 return ReturnResponse(customerModel, new JsonMediaTypeFormatter(), "application/json", HttpStatusCode.OK, string.Empty);
             }
-            else
-            {
-                return ReturnResponse(new Object(), null, string.Empty, HttpStatusCode.NotFound, "Unable to find the Customer");
-            }
-
-            return PostCustomer(customerModel);
-
+            
+            return null;
         }
 
         [HttpPatch]

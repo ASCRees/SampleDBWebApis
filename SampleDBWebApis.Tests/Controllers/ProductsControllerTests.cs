@@ -216,8 +216,6 @@ namespace SampleDBWebApis.Tests.Controllers
             // Act
             var productHttpResponse = productsController.PatchProduct(product);
 
-            var productViewModel = (ProductPatchViewModel)((System.Net.Http.ObjectContent)productHttpResponse.Content).Value;
-
             // Assert
             productHttpResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
 

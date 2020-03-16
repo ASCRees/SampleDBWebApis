@@ -10,11 +10,15 @@ using SampleDBWebApis.ModelBuilders;
 using System;
 using Moq;
 using SampleDBWebApis.Service;
+using AutoMapper;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace SampleDBWebApis.Tests.Controllers
 {
     public class CustomersControllerTests:BaseCustomerTests
     {
+
         [SetUp]
         public override void Setup()
         {
@@ -70,6 +74,35 @@ namespace SampleDBWebApis.Tests.Controllers
         }
 
         [Test]
+        public void PostCustomer_Create_New_Customer_Mock()
+        {
+            // Arrange
+
+            var newCustomerModel = Mapper.Map<CustomerViewModel>(createdCustomerModel);
+
+            CustomersController customersController = null;
+
+            // Mock the GetCustomer
+
+            var mockcustomerModelsServices = new Mock<IBuildCustomersModelServices>();
+            mockcustomerModelsServices.Setup(x => x.CreateNewCustomer(It.IsAny<DataLayer.Customer>())).Returns(()=> { 
+                createdCustomerModel.CustomerID = customerID; 
+                return createdCustomerModel; 
+            });
+
+            customersController = new CustomersController(mockcustomerModelsServices.Object, new CustomerModelBuilders(mockcustomerModelsServices.Object));
+
+
+            // Act
+            var customerHttpResponse = customersController.PostCustomer(newCustomerModel);
+            var customerResultsViewModel = (CustomerViewModel)((System.Net.Http.ObjectContent)customerHttpResponse.Content).Value;
+
+            // Assert
+            customerResultsViewModel.CustomerID.Should().Be(customerID);
+
+        }
+
+        [Test]
         public void Get_Customer_By_Starting_String()
         {
             // Arrange
@@ -84,7 +117,7 @@ namespace SampleDBWebApis.Tests.Controllers
         }
 
         [Test]
-        public void PutCustomer_Update_Existing_Customer()
+        public void PutCustomer_Valid_Update_Existing_Customer_Mock()
         {
             // Arrange
 
@@ -97,37 +130,103 @@ namespace SampleDBWebApis.Tests.Controllers
 
             customerViewModel.CompanyName = companyName;
 
+            var custContext = Mapper.Map<DataLayer.Customer>(customerViewModel);
+
+            // Mock the GetCustomer
+
+            var mockcustomerModelsServices = new Mock<IBuildCustomersModelServices>();
+            mockcustomerModelsServices.Setup(x => x.GetCustomer(It.IsAny<string>())).Returns(custContext);
+            mockcustomerModelsServices.Setup(x => x.UpdateCustomer()).Returns(1);
+
+            customersController = new CustomersController(mockcustomerModelsServices.Object, new CustomerModelBuilders(mockcustomerModelsServices.Object));
+
             // Act
             var customerHttpResponse = customersController.PutCustomer(customerViewModel);
             var customerResultViewModel = (CustomerViewModel)((System.Net.Http.ObjectContent)customerHttpResponse.Content).Value;
 
             // Assert
             customerResultViewModel.CompanyName.Should().BeEquivalentTo(companyName);
+            customerHttpResponse.StatusCode.Should().BeEquivalentTo(HttpStatusCode.OK);
+        }
+
+        [Test]
+        public void PutCustomer_Valid_Update_Existing_Customer_Throws_Error_Mock()
+        {
+            // Arrange
+
+            var newCustomerModel = Mapper.Map<CustomerViewModel>(createdCustomerModel);
+
+            // Mock the GetCustomer
+
+            var mockcustomerModelsServices = new Mock<IBuildCustomersModelServices>();
+            DataLayer.Customer returnCustomerVal = null;
+            mockcustomerModelsServices.Setup(x => x.CreateNewCustomer(It.IsAny<DataLayer.Customer>())).Throws(new ArgumentException("Invalid Value"));
+            mockcustomerModelsServices.Setup(x => x.GetCustomer(It.IsAny<string>())).Returns(returnCustomerVal);
+            customersController = new CustomersController(mockcustomerModelsServices.Object, new CustomerModelBuilders(mockcustomerModelsServices.Object));
+
+            // Act
+            var customerHttpResponse = customersController.PutCustomer(newCustomerModel);
+
+            // Assert
+            customerHttpResponse.StatusCode.Should().BeEquivalentTo(HttpStatusCode.BadRequest);
+
 
         }
 
-        //[Test]
-        //public void PostProduct_Create_New_Product()
-        //{
-        //    // Arrange
-        //    ProductViewModel product = new ProductViewModel
-        //    {
-        //        ProductName = "Tomatoe Ketchup",
-        //        UnitPrice = 1.59m,
-        //        UnitsInStock = 200,
-        //        SupplierID = 1,
-        //        CategoryID = 1,
-        //        UnitsOnOrder = 0
-        //    };
+        [Test]
+        public void PutCustomer_Valid_Update_New_Customer_Mock()
+        {
+            // Arrange
 
-        //    // Act
-        //    var productHttpResponse = customersController.PostProduct(product);
-        //    var productViewModel =(ProductViewModel)((System.Net.Http.ObjectContent)productHttpResponse.Content).Value;
+            var newCustomerModel = Mapper.Map<CustomerViewModel>(createdCustomerModel);
 
-        //    // Assert
-        //    productViewModel.ProductID.Should().BeGreaterThan(0);
+            // Mock the GetCustomer
 
-        //}
+            var mockcustomerModelsServices = new Mock<IBuildCustomersModelServices>();
+            DataLayer.Customer returnCustomerVal = null;
+            mockcustomerModelsServices.Setup(x => x.CreateNewCustomer(It.IsAny<DataLayer.Customer>())).Returns(() => {
+                createdCustomerModel.CustomerID = customerID;
+                return createdCustomerModel;
+            });
+            mockcustomerModelsServices.Setup(x => x.GetCustomer(It.IsAny<string>())).Returns(returnCustomerVal);
+            customersController = new CustomersController(mockcustomerModelsServices.Object, new CustomerModelBuilders(mockcustomerModelsServices.Object));
+
+            // Act
+            var customerHttpResponse = customersController.PutCustomer(newCustomerModel);
+            var customerResultsViewModel = (CustomerViewModel)((System.Net.Http.ObjectContent)customerHttpResponse.Content).Value;
+
+            // Assert
+            customerResultsViewModel.CustomerID.Should().Be(customerID);
+        }
+
+        [Test]
+        public void PutCustomer_Customer_Invalid_Model()
+        {
+            // Arrange
+
+            var updateCustomerModel = new CustomerViewModel
+            {
+                CustomerID = "TEST1",
+                CompanyName = null,
+                ContactName = "Gus",
+                Phone = "555-2121",
+                City = "Alburquerque",
+                ContactTitle = "Don",
+                Address = "1 Main Street",
+                PostalCode = "76243",
+                Region = "",
+                Country = "USA"
+            };
+
+            var result = new List<ValidationResult>();
+
+            // Act​
+            var isValid = Validator.TryValidateObject(updateCustomerModel, new System.ComponentModel.DataAnnotations.ValidationContext(updateCustomerModel), result);
+            
+            // Asset
+            isValid.Should().BeFalse();
+
+        }
 
         //[Test]
         //public void PutProduct_Update_Product()

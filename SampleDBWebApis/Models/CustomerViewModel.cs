@@ -1,11 +1,21 @@
-﻿namespace SampleDBWebApis.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace SampleDBWebApis.Models
 {
     public class CustomerViewModel
     {
+        
         public string CustomerID { get; set; }
+        
+        [Required]
         public string CompanyName { get; set; }
+        
+        [Required]
         public string ContactName { get; set; }
+        
         public string ContactTitle { get; set; }
+        
+        [Required]
         public string Address { get; set; }
         public string City { get; set; }
         public string Region { get; set; }
