@@ -12,3 +12,7 @@ Version 0.1
 
 After cloning run "Update-package -reinstall" in Package Manager console.
 Build it and open in a browser. This will take you to the swagger page.
+
+
+![image](https://user-images.githubusercontent.com/28151071/77850306-7dbb1800-71c9-11ea-8c34-3895e86973ea.png)
+
