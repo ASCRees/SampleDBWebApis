@@ -3,7 +3,7 @@ SampleDBWebApis
 
 ### What is this repository for?
 
-Contains some sample web apis written in MVC to read and write to a sample sql server database containg four tables that are based on the Northwind tables.
+Contains some sample MVC web apis that use EntityFramework to read and write to a sample SQL Server database containing four tables that are based on the Northwind tables.
 
 Version 0.1
 
