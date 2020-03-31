@@ -18,8 +18,10 @@
 
 namespace SampleDBWebApis.DependencyResolution {
     using StructureMap;
+    using System.Diagnostics.CodeAnalysis;
     using System.Web;
 
+    [ExcludeFromCodeCoverage]
     public static class IoC {
         public static IContainer Initialize()
         {

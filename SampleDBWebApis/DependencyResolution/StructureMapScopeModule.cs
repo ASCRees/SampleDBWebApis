@@ -1,9 +1,12 @@
 namespace SampleDBWebApis.DependencyResolution {
+    using System.Diagnostics.CodeAnalysis;
     using System.Web;
 
     using SampleDBWebApis.App_Start;
 
     using StructureMap.Web.Pipeline;
+
+    [ExcludeFromCodeCoverage]
 
     public class StructureMapScopeModule : IHttpModule {
         #region Public Methods and Operators

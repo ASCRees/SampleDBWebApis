@@ -25,7 +25,10 @@ namespace SampleDBWebApis.DependencyResolution {
     using Microsoft.Practices.ServiceLocation;
 
     using StructureMap;
-	
+    using System.Diagnostics.CodeAnalysis;
+
+    [ExcludeFromCodeCoverage]
+
     /// <summary>
     /// The structure map dependency scope.
     /// </summary>

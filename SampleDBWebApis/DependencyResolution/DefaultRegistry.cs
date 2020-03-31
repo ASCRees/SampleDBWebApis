@@ -22,7 +22,9 @@ namespace SampleDBWebApis.DependencyResolution {
     using StructureMap.Graph;
     using SampleDBWebApis.ModelBuilders;
     using SampleDBWebApis.Service;
+    using System.Diagnostics.CodeAnalysis;
 
+    [ExcludeFromCodeCoverage]
     public class DefaultRegistry : Registry {
         #region Constructors and Destructors
 

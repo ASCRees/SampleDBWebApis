@@ -22,16 +22,19 @@ using WebActivatorEx;
 [assembly: PreApplicationStartMethod(typeof(StructuremapMvc), "Start")]
 [assembly: ApplicationShutdownMethod(typeof(StructuremapMvc), "End")]
 
-namespace SampleDBWebApis.App_Start {
-	using System.Web.Mvc;
+namespace SampleDBWebApis.App_Start
+{
+    using System.Diagnostics.CodeAnalysis;
+    using System.Web.Mvc;
 
     using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 
 	using SampleDBWebApis.DependencyResolution;
 
     using StructureMap;
-    
-	public static class StructuremapMvc {
+
+    [ExcludeFromCodeCoverage]
+    public static class StructuremapMvc {
         #region Public Properties
 
         public static StructureMapDependencyScope StructureMapDependencyScope { get; set; }
