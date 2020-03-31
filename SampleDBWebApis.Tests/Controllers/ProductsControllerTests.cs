@@ -97,30 +97,6 @@ namespace SampleDBWebApis.Tests.Controllers
         }
 
         [Test]
-        public void PutProduct_Update_Product_NotFound()
-        {
-            // Arrange
-            ProductViewModel product = new ProductViewModel
-            {
-                ProductID = 191919191,
-                ProductName = "BBQ Sauce",
-                UnitPrice = 1.39m,
-                UnitsInStock = 90,
-                SupplierID = 1,
-                CategoryID = 1,
-                UnitsOnOrder = 100,
-
-            };
-
-            // Act
-            var productHttpResponse = productsController.PutProduct(product);
-
-            // Assert
-            productHttpResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-        }
-
-        [Test]
         public void PutProduct_Update_Product_Model_Not_Valid()
         {
             // Arrange

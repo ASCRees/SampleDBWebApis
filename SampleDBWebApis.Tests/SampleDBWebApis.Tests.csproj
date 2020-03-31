@@ -127,6 +127,7 @@
     <Compile Include="Controllers\CustomersControllerTests.cs" />
     <Compile Include="Controllers\ProductsControllerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceLayer\CustomerTests.cs" />
     <Compile Include="ServiceLayer\ProductTests.cs" />
   </ItemGroup>
   <ItemGroup>
