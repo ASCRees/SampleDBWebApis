@@ -1,7 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SampleDBWebApis.Models
 {
+    [ExcludeFromCodeCoverage]
+
     public class CustomerViewModel
     {
         

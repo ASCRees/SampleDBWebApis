@@ -15,11 +15,14 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Diagnostics.CodeAnalysis;
 using System.Web.Http.Dependencies;
 using StructureMap;
 
 namespace SampleDBWebApis.DependencyResolution
 {
+    [ExcludeFromCodeCoverage]
+
     /// <summary>
     /// The structure map dependency resolver.
     /// </summary>

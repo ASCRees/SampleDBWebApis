@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Web.Http.Dependencies;
 using Microsoft.Practices.ServiceLocation;
@@ -24,6 +25,8 @@ using StructureMap;
 
 namespace SampleDBWebApis.DependencyResolution
 {
+    [ExcludeFromCodeCoverage]
+
     /// <summary>
     /// The structure map web api dependency scope.
     /// </summary>

@@ -15,12 +15,16 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Diagnostics.CodeAnalysis;
 using System.Web.Http;
 using SampleDBWebApis.DependencyResolution;
 
 [assembly: WebActivatorEx.PostApplicationStartMethod(typeof(SampleDBWebApis.App_Start.StructuremapWebApi), "Start")]
 
 namespace SampleDBWebApis.App_Start {
+
+    [ExcludeFromCodeCoverage]
+   
     public static class StructuremapWebApi {
         public static void Start() {
 			var container = StructuremapMvc.StructureMapDependencyScope.Container;

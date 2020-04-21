@@ -1,9 +1,11 @@
 ﻿using SampleDBWebApis.App_Start;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Web.Http;
 
 namespace SampleDBWebApis
 {
+    [ExcludeFromCodeCoverage]
     public static class WebApiConfig
     {
         public static void Register(HttpConfiguration config)
